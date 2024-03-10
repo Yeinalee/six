@@ -12,7 +12,8 @@ from rest_framework.decorators import api_view
 import os
 
 
-key = os.environ.get('OPENAI_API_KEY')
+#key = os.environ.get('OPENAI_API_KEY')
+key = " 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"
 engine = "davinci"
 
 @api_view(["POST"])
@@ -50,33 +51,21 @@ def bb(request, story_id):
     if request.method == 'POST':
         request_json = json.loads(request.body)
         messages = request_json.get('messages', [])
-        # tools = [
-        #     {
-        #         "type": "function",
-        #         "function": {
-        #         "name": "fairy_tale",
-        #         "description": "I'm going to write a fairy tale in Korean. When I write a paragraph first, you provide the next paragraph. We'll go back and forth 8 times, and then you wrap up the story.",
-        #         "parameters": {
-        #             "type": "object",
-        #             "properties": {
-        #             "location": {
-        #                 "type": "string",
-        #                 "description": "The city and state, e.g. San Francisco, CA",
-        #             },
-        #             "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
-        #             },
-        #             "required": ["location"],
-        #         },
-        #         }
-        #     }
-        #     ]
+        tools = [
+            {
+                "type": "function",
+                "function": {
+                "name": "fairy_tale",
+                "description": "I'm going to write a fairy tale in Korean. When I write a paragraph first, you provide the next paragraph. We'll go back and forth 8 times, and then you wrap up the story.",
+                }
+            }
+            ]
         
         # Use OpenAI API to summarize conversation
         response = client.chat.completions.create(
              model="gpt-4",
              messages=messages,
-             instructions="You are a personal math tutor. When asked a math question, write and run code to answer the question.",
-             max_tokens=200
+             tools = tools,
         )
         summary = response.choices[0].message.content if response.choices else ''
 
