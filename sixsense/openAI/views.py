@@ -22,7 +22,7 @@ def chat(request, story_id):
             return Response({"error": "Invalid JSON format"}, status=400)
         
         # 요청 변환을 수행합니다.
-        request_next_sentence = claude(request)
+        request_next_sentence = claude(request_json)
         trequest_summary = "stylized picture of a cute old steampunk robot" #transform_summary(request_json)
         return Response({"next_sentence": request_next_sentence})
     
@@ -35,20 +35,26 @@ def combine(messages):
     return chatlog
 
 
-def claude(request):
+def claude(request_data):
     client = boto3.client(service_name="bedrock-runtime", region_name="us-east-1")
     model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
+    messages = request_data.get('messages', [])
+    if messages:
+        content = messages[0].get('content', '')
+    else:
+        content = ""
     response = client.invoke_model(
         modelId=model_id,
         body=json.dumps({
                 "anthropic_version": "bedrock-2023-05-31",
                 "max_tokens": 1024,
-                "messages": request.get("messages"),
+                "messages": content,
                 "system": """너는 내 국어 선생님이야, 반말을 쓰도록해해. 나는 2페이지 동화를 쓸 생각인데 brainstorming에 도움을줘. 내가 한 단락쓰면 너도 한 단락써서 이야기를 재밌게 할꺼야.
 추가적으로 내차례는 따로 말을 할 필요는 없어.""",
             }
         ),
     )
+    
     # Process and print the response(s)
     response_body = json.loads(response.get("body").read())
     for output in response_body.get("content", []):
