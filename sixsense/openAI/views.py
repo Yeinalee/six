@@ -36,11 +36,6 @@ def combine(messages):
 
 
 def claude(request):
-    global messages
-    if messages:
-        chatlog = combine(messages)
-        prompt = chatlog + "\n" + prompt
-    messages.appendleft({"role": "user", "content": prompt})
     client = boto3.client(service_name="bedrock-runtime", region_name="us-east-1")
     model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
     response = client.invoke_model(
