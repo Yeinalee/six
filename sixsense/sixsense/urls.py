@@ -16,9 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from openAI.views import chat
+#from openAI.views import chat
+from aa.views import aa
+from aa.views import bb
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('story/<int:story_id>/image/', chat),
+    path('story/<int:story_id>/image/', aa),
+    path('story/<int:story_id>/sentece/', bb),
 ]
